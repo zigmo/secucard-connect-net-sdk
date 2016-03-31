@@ -29,7 +29,12 @@ namespace Secucard.Connect.Net.Rest
         {
             var ret = RestGet(request);
 
-            return JsonSerializer.DeserializeJson<ObjectList<T>>(ret);
+            ObjectList<T> list = JsonSerializer.DeserializeJson<ObjectList<T>>(ret);
+            if (list.List == null)
+            {
+                list.List = new List<T>();
+            }
+            return list;
         }
 
         public T GetObject<T>(RestRequest request)

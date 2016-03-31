@@ -22,9 +22,14 @@ namespace Secucard.Connect.Auth
     {
         private readonly DataStorage _storage;
 
-        public AbstractClientAuthDetails()
+        protected AbstractClientAuthDetails()
         {
             _storage = new MemoryDataStorage();
+        }
+
+        protected AbstractClientAuthDetails(DataStorage dataStorage)
+        {
+            _storage = dataStorage;
         }
 
         public Token GetCurrent()

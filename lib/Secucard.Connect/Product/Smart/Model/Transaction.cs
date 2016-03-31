@@ -21,13 +21,33 @@ namespace Secucard.Connect.Product.Smart.Model
     [DataContract]
     public class Transaction : SecuObject
     {
-        public static string StatusCreated = "created";
-        public static string StatusCanceled = "canceled";
-        public static string StatusFinished = "finished";
-        public static string StatusAborted = "aborted";
-        public static string StatusFailed = "failed";
-        public static string StatusTimeout = "timeout";
-        public static string StatusOk = "ok";
+        public Transaction()
+        {
+            TypedStatus = StatusEnum.Unknown;
+        }
+
+        public enum StatusEnum
+        {
+            Unknown,
+            Aborted,
+            Canceled,
+            Created,
+            Failed,
+            Finished,
+            OK,
+            Timeout
+        }
+
+        private static readonly IDictionary<string, StatusEnum> StatusStrings = new Dictionary<string, StatusEnum>
+        {
+            {"aborted", StatusEnum.Aborted},
+            {"canceled", StatusEnum.Canceled},
+            {"created", StatusEnum.Created},
+            {"failed", StatusEnum.Failed},
+            {"finished", StatusEnum.Finished},
+            {"ok", StatusEnum.OK},
+            {"timeout", StatusEnum.Timeout}
+        };
 
         [DataMember(Name = "device_source", EmitDefaultValue = false)]
         public Device DeviceSource { get; set; }
@@ -38,8 +58,31 @@ namespace Secucard.Connect.Product.Smart.Model
         [DataMember(Name = "target_device", EmitDefaultValue = false)]
         public Device TargetDevice { get; set; }
 
+        public event EventHandler<StatusEnum> StatusChanged;
+        public StatusEnum TypedStatus { get; private set; }
+
+        private string _status;
+
         [DataMember(Name = "status")]
-        public string Status { get; set; }
+        public string Status
+        {
+            get { return _status; }
+            set
+            {
+                if (_status == value) return;
+                _status = value;
+                if (StatusStrings.ContainsKey(Status))
+                {
+                    TypedStatus = StatusStrings[Status];
+                }
+                else
+                {
+                    TypedStatus = StatusEnum.Unknown;
+                }
+
+                StatusChanged?.Invoke(this, TypedStatus);
+            }
+        }
 
         [DataMember(Name = "created")]
         public string FormattedCreated
