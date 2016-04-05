@@ -25,6 +25,9 @@ namespace Secucard.Connect.Product.Loyalty.Model
         [DataMember(Name = "merchant")]
         public Merchant Merchant { get; set; }
 
+        [DataMember(Name = "contact")]
+        public General.Model.Contact Contact { get; set; }
+
         [DataMember(Name = "forename")]
         public string ForeName { get; set; }
 
