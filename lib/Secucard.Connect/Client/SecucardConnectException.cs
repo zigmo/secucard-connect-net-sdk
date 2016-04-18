@@ -16,5 +16,16 @@ namespace Secucard.Connect.Client
 
     public class SecucardConnectException : Exception
     {
+        public SecucardConnectException(string message)
+        {
+            _message = message;
+        }
+
+        public override string Message
+        {
+            get { return _message; }
+        }
+
+        protected readonly string _message;
     }
 }

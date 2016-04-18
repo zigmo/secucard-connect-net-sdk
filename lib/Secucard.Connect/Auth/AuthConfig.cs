@@ -22,7 +22,9 @@ namespace Secucard.Connect.Auth
 
         public AuthConfig(Properties properties)
         {
-            OAuthUrl = properties.Get("Auth.OAuthUrl", "https://connect.secucard.com/oauth/token");
+            OAuthUrl = string.Format("https://{0}{1}", properties.Get("Host", "connect.secucard.com"),
+                properties.Get("Auth.OAuthUrl", "/oauth/token"));
+
             AuthWaitTimeoutSec = properties.Get("Auth.AuthWaitTimeoutSec", 240);
             ExtendExpire = properties.Get("Auth.ExtendExpire", true);
         }

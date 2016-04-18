@@ -10,13 +10,38 @@
  * limitations under the License.
  */
 
+using System.Runtime.Serialization;
+
 namespace Secucard.Connect.Net.Rest
 {
     using System;
 
+    [DataContract]
+    public class ErrorBody
+    {
+        [DataMember(Name = "error")]
+        public string Error { get; set; }
+
+        [DataMember(Name = "error_description")]
+        public string ErrorDescription { get; set; }
+    }
+
     public class RestException : Exception
     {
-        public string BodyText { get; set; }
+        private string _bodytext;
+
+        public string BodyText
+        {
+            get { return _bodytext; }
+            set
+            {
+                _bodytext = value;
+                Error = Util.JsonSerializer.TryDeserializeJson<ErrorBody>(BodyText);
+            }
+        }
+
+        public ErrorBody Error { get; private set; }
+
         public int? StatusCode { get; set; }
         public string StatusDescription { get; set; }
     }

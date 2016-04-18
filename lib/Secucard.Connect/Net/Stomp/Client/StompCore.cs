@@ -112,7 +112,16 @@ namespace Secucard.Connect.Net.Stomp.Client
                 var state = (StreamStateObject) ar.AsyncState;
                 var stream = state.Stream;
 
-                var bytesRead = stream.EndRead(ar);
+                int bytesRead;
+                try
+                {
+                    bytesRead = stream.EndRead(ar);
+                }
+                catch (IOException)
+                {
+                    // Read operation failed or encryption is in use, but the data could not be decrypted.
+                    bytesRead = 0;
+                }
 
                 if (bytesRead > 0)
                 {
@@ -138,6 +147,10 @@ namespace Secucard.Connect.Net.Stomp.Client
                 {
                     if (!_stop)
                         stream.BeginRead(state.Buffer, 0, StreamStateObject.BufferSize, ReceiveCallback, state);
+                }
+                catch (SocketException ex)
+                {
+                    OnException(ex);
                 }
                 catch (IOException ex)
                 {

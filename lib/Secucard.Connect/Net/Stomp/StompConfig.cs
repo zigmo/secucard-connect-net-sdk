@@ -20,7 +20,7 @@ namespace Secucard.Connect.Net.Stomp
         {
             Ssl = properties.Get("Stomp.Ssl", true);
 
-            Host = properties.Get("Stomp.Host", "connect.secucard.com");
+            Host = properties.Get("Host", "connect.secucard.com");
             VirtualHost = properties.Get("Stomp.VirtualHost");
             Port = properties.Get("Stomp.port", 61614);
 

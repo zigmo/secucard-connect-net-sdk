@@ -48,15 +48,16 @@ namespace Secucard.Connect.Net.Stomp
             _channelId = Guid.NewGuid().ToString();
             _stomp = new StompClient(_configuration);
             _stomp.StompClientFrameArrivedEvent += StompOnStompClientFrameArrivedEvent;
-            _stomp.StompClientChangedEvent += Stomp_StompClientChangedEvent;
+            _stomp.StompClientChangedEvent += StompOnStompClientChangedEvent;
+        }
+
+        public StompClientStatusChangedEventHandler StompClientStatusChangedEvent;
+        private void StompOnStompClientChangedEvent(object sender, StompClientStatusChangedEventArgs args)
+        {
+            StompClientStatusChangedEvent?.Invoke(this, args);
         }
 
         public StompEventArrivedEventHandler StompEventArrivedEvent;
-
-        private void Stomp_StompClientChangedEvent(object sender, StompClientStatusChangedEventArgs args)
-        {
-            // TODO: Tell someone, that stomp client changed status
-        }
 
         private void StompOnStompClientFrameArrivedEvent(object sender, StompClientFrameArrivedArgs args)
         {
@@ -84,6 +85,21 @@ namespace Secucard.Connect.Net.Stomp
             var returnMessage = SendMessage(stompRequest);
             SecucardTrace.InfoSource("StompChannel.Request", returnMessage.EscapeCurlyBracets());
             var response = new Response(returnMessage);
+            if (response.Status == "error")
+            {
+                var errorStatus = JsonSerializer.DeserializeJson<Status>(returnMessage);
+                throw new SecucardConnectException(string.Format(
+                    "Error: {1}{0}" +
+                    "Code: {2}{0}" +
+                    "Description: {3}{0}" +
+                    "Details: {4}{0}" +
+                    "User: {5}{0}" +
+                    "Status prop: {6}{0}" +
+                    "Support id: {7}",
+                    Environment.NewLine, errorStatus.Error, errorStatus.Code, errorStatus.ErrorDescription,
+                    errorStatus.ErrorDetails, errorStatus.ErrorUser, errorStatus.StatusProp, errorStatus.SupportId));
+            }
+
             return JsonSerializer.DeserializeJson<T>(response.Data);
         }
 
@@ -132,7 +148,16 @@ namespace Secucard.Connect.Net.Stomp
                     // just log...
                     SecucardTrace.Info("Error disconnecting. {0}", e);
                 }
-                Connect(token);
+
+                try
+                {
+                    Connect(token);
+                }
+                catch (Exception e)
+                {
+                    // just log...
+                    SecucardTrace.Info("Error connecting. {0}", e);
+                }
             }
         }
 
@@ -246,10 +271,20 @@ namespace Secucard.Connect.Net.Stomp
 
             var stompRequest = StompRequest.Create(channelRequest, _channelId, _configuration.ReplyTo,
                 _configuration.Destination);
-            var returnMessage = SendMessage(stompRequest);
+
+            var returnMessage = string.Empty;
+            try
+            {
+                returnMessage = SendMessage(stompRequest);
+            }
+            catch (MessageTimeoutException ex)
+            {
+                SecucardTrace.Error("StompChannel.SendSessionRefresh", ex.Message);
+            }
+            
 
             var response = new Response(returnMessage);
-            return JsonSerializer.DeserializeJson<StompResult>(response.Data).Result;
+            return JsonSerializer.DeserializeJson<StompResult>(response.Data)?.Result;
         }
 
         private void StartSessionRefresh()

@@ -34,7 +34,6 @@ namespace Secucard.Connect.Auth
             _rest = restAuth;
         }
 
-        private bool CancelAuthFlag { get; set; }
         private IClientAuthDetails ClientAuthDetails { get; set; }
         public event TokenManagerStatusUpdateEventHandler TokenManagerStatusUpdateEvent;
 
@@ -47,7 +46,7 @@ namespace Secucard.Connect.Auth
             return null;
         }
 
-        public string GetToken(bool allowInteractive)
+        public string GetToken(bool allowInteractive, CancellationToken? cancellationToken = null)
         {
             var token = GetCurrent();
 
@@ -110,7 +109,7 @@ namespace Secucard.Connect.Auth
                     throw new AuthFailedException("Invalid access token, please authenticate again.");
                 }
 
-                token = Authenticate(credentials);
+                token = Authenticate(credentials, cancellationToken);
                 token.SetExpireTime();
                 token.Id = credentials.Id;
                 SetCurrentToken(token);
@@ -141,7 +140,7 @@ namespace Secucard.Connect.Auth
             token.SetExpireTime();
         }
 
-        private Token Authenticate(OAuthCredentials credentials)
+        private Token Authenticate(OAuthCredentials credentials, CancellationToken? cancellationToken)
         {
             if (credentials == null)
             {
@@ -196,8 +195,24 @@ namespace Secucard.Connect.Auth
                 if (isDeviceAuth)
                 {
                     // in case of device auth, check for cancel and delay polling
-                    if (CancelAuthFlag) throw new AuthCanceledException("Authorization canceled by request.");
-                    Thread.Sleep(pollInterval*1000);
+                    if (cancellationToken == null)
+                    {
+                        Thread.Sleep(pollInterval*1000);
+                    }
+                    else
+                    {
+                        var canceled = cancellationToken?.WaitHandle.WaitOne(pollInterval*1000);
+                        if (canceled.Value)
+                        {
+                            TokenManagerStatusUpdateEvent?.Invoke(this,
+                                new TokenManagerStatusUpdateEventArgs
+                                {
+                                    DeviceAuthCodes = null,
+                                    Status = AuthStatusEnum.Canceled
+                                });
+                            throw new AuthCanceledException("Authorization canceled by request.");
+                        }
+                    }
 
                     token = _rest.ObtainAuthToken(codes.DeviceCode, devicesCredentials.ClientId,
                         devicesCredentials.ClientSecret);

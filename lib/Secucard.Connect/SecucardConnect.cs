@@ -10,7 +10,9 @@
  * limitations under the License.
  */
 
+using System.Threading;
 using Secucard.Connect.Client.Config;
+using Secucard.Connect.Net.Stomp.Client;
 
 namespace Secucard.Connect
 {
@@ -56,19 +58,20 @@ namespace Secucard.Connect
 
         public event AuthEvent AuthEvent;
         public event ConnectionStateChangedEventHandler ConnectionStateChangedEvent;
+        public event StompClientStatusChangedEventHandler ClientStatusChangedEvent;
 
         #region ### Open / Close ###
 
         /// <summary>
         ///    Authenticate and open internal resources
         /// </summary>
-        public void Open()
+        public void Open(CancellationToken cancellationToken)
         {
             if (_isConnected) return;
 
             try
             {
-                var token = _context.TokenManager.GetToken(true);
+                var token = _context.TokenManager.GetToken(true, cancellationToken);
                 SecucardTrace.Info("Auth successfull. Token = {0}", token);
             }
             catch (AuthError)
@@ -197,6 +200,7 @@ namespace Secucard.Connect
                 var stompChannel = new StompChannel(stompConfig, context);
                 context.Channels.Add(ChannelOptions.ChannelStomp, stompChannel);
                 stompChannel.StompEventArrivedEvent += context.EventDispatcher.StompMessageArrivedEvent;
+                stompChannel.StompClientStatusChangedEvent += StompClientStatusChangedEvent;
             }
 
             var restAuth = new RestAuth(authConfig)
@@ -215,6 +219,11 @@ namespace Secucard.Connect
 
             _serviceDict = ServiceFactory.CreateServices(context);
             WireServiceInstances();
+        }
+
+        private void StompClientStatusChangedEvent(object sender, StompClientStatusChangedEventArgs args)
+        {
+            ClientStatusChangedEvent?.Invoke(this, args);
         }
 
         public static SecucardConnect Create(ClientConfiguration configuration)

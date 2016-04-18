@@ -18,7 +18,7 @@ namespace Secucard.Connect.Net.Rest
     {
         public RestConfig(Properties properties)
         {
-            Url = properties.Get("Rest.Url");
+            Url = string.Format("https://{0}{1}", properties.Get("Host"), properties.Get("Rest.Url"));
             ResponseTimeoutSec = properties.Get("Rest.ResponseTimeoutSec", 300);
             ConnectTimeoutSec = properties.Get("Rest.ConnectTimeoutSec", 300);
         }

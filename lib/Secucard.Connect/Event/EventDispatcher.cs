@@ -79,7 +79,7 @@ namespace Secucard.Connect.Event
             var dict = JsonSerializer.DeserializeToDictionary(body);
 
             // Check if it is an event.pushs message
-            if (dict.ContainsKey("object") && (string) dict["object"] == "event.pushs")
+            if (dict != null && dict.ContainsKey("object") && (string) dict["object"] == "event.pushs")
             {
                 if (dict.ContainsKey("type") && (string) dict["type"] == "display")
                 {

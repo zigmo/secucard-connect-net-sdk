@@ -10,6 +10,8 @@
  * limitations under the License.
  */
 
+using System.Net.Sockets;
+
 namespace Secucard.Connect.Net.Stomp.Client
 {
     using System;
@@ -87,7 +89,14 @@ namespace Secucard.Connect.Net.Stomp.Client
         private void Core_StompCoreExceptionEvent(object sender, StompCoreExceptionEventArgs args)
         {
             OnStatusChanged(EnumStompClientStatus.NotConnected);
-            Connect(_login, _password);
+            try
+            {
+                Connect(_login, _password);
+            }
+            catch (SocketException)
+            {
+                // do nothing
+            }
         }
 
         public void Disconnect()
@@ -116,7 +125,16 @@ namespace Secucard.Connect.Net.Stomp.Client
             _core.SendFrame(frame);
 
             if (_config.RequestSENDReceipt && frame.Command != StompCommands.Disconnect)
-                AwaitReceipt(rcptId, frame.TimeoutSec);
+            {
+                try
+                {
+                    AwaitReceipt(rcptId, frame.TimeoutSec);
+                }
+                catch (NoReceiptException ex)
+                {
+                    SecucardTrace.Error("StompClient.SendFrame", ex.Message);
+                }
+            }
         }
 
         private void AwaitReceipt(string rcptId, int? timeoutSec)

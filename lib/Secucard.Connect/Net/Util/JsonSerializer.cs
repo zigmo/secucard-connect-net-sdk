@@ -10,6 +10,8 @@
  * limitations under the License.
  */
 
+using System;
+
 namespace Secucard.Connect.Net.Util
 {
     using System.Collections.Generic;
@@ -39,6 +41,9 @@ namespace Secucard.Connect.Net.Util
 
         public static T DeserializeJson<T>(string jsonString)
         {
+            if (jsonString == null)
+                return default(T);
+
             var serializer = new DataContractJsonSerializer(typeof (T));
             using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(jsonString)))
             {
@@ -62,7 +67,7 @@ namespace Secucard.Connect.Net.Util
             using (var ms = new MemoryStream())
             {
                 serializer.WriteObject(ms, data);
-                return Encoding.Default.GetString(ms.ToArray());
+                return Encoding.UTF8.GetString(ms.ToArray());
             }
         }
 
@@ -73,7 +78,7 @@ namespace Secucard.Connect.Net.Util
             using (var ms = new MemoryStream())
             {
                 serializer.WriteObject(ms, data);
-                return Encoding.Default.GetString(ms.ToArray());
+                return Encoding.UTF8.GetString(ms.ToArray());
             }
         }
 
