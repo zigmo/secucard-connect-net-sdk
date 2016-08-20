@@ -53,6 +53,9 @@ namespace Secucard.Connect.Product.Smart.Model
             }
         }
 
+        [DataMember(Name = "merchantcard")]
+        public MerchantCard MerchantCard { get; set; }
+
         [IgnoreDataMember]
         public MediaResource PictureObject { get; set; }
 

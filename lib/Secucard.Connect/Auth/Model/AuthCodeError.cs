@@ -17,10 +17,10 @@ namespace Secucard.Connect.Auth.Model
     [DataContract]
     public class AuthCodeError
     {
-        [DataMember(Name = "error")]
+        [DataMember(Name = "error", IsRequired = true)]
         public string Error { get; set; }
 
-        [DataMember(Name = "error_description")]
+        [DataMember(Name = "error_description", IsRequired = true)]
         public string ErrorDescription { get; set; }
 
         public override string ToString()

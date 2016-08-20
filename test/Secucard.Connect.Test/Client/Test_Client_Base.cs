@@ -10,6 +10,8 @@
  * limitations under the License.
  */
 
+using System.Threading;
+
 namespace Secucard.Connect.Test.Client
 {
     using System;
@@ -49,7 +51,7 @@ namespace Secucard.Connect.Test.Client
             Client = SecucardConnect.Create(_clientConfigurationDevice);
             Client.AuthEvent += ClientOnAuthEvent;
             Client.ConnectionStateChangedEvent += ClientOnConnectionStateChangedEvent;
-            Client.Open();
+            Client.Open(new CancellationTokenSource().Token);
         }
 
         protected void StartupClientUser()
@@ -57,7 +59,7 @@ namespace Secucard.Connect.Test.Client
             Client = SecucardConnect.Create(_clientConfigurationUser);
             Client.AuthEvent += ClientOnAuthEvent;
             Client.ConnectionStateChangedEvent += ClientOnConnectionStateChangedEvent;
-            Client.Open();
+            Client.Open(new CancellationTokenSource().Token);
         }
 
         /// <summary>

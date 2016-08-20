@@ -19,5 +19,32 @@ namespace Secucard.Connect.Auth.Exception
     /// </summary>
     public class AuthTimeoutException : AuthError
     {
+        private string _error;
+
+        public string GetError()
+        {
+            return _error;
+        }
+
+        public void SetError(string error)
+        {
+            _error = error;
+        }
+
+        public AuthTimeoutException(string message, string error)
+            : base(message)
+        {
+            _error = error;
+        }
+
+        public AuthTimeoutException(string message)
+            : base(message)
+        {
+        }
+
+        public AuthTimeoutException(string message, System.Exception cause)
+            : base(message, cause)
+        {
+        }
     }
 }

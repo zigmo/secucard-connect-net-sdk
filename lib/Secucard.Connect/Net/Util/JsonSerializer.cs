@@ -11,6 +11,8 @@
  */
 
 using System;
+using System.Runtime.Serialization;
+using Secucard.Connect.Net.Rest;
 
 namespace Secucard.Connect.Net.Util
 {

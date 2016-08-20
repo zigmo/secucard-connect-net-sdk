@@ -24,7 +24,7 @@ namespace Secucard.Connect.Product.Loyalty.Model
         [DataMember(Name = "account")]
         public Account Account { get; set; }
 
-        [DataMember(Name = "cardNumber")]
+        [DataMember(Name = "cardnumber")]
         public string CardNumber { get; set; }
 
         public DateTime? Created { get; set; }

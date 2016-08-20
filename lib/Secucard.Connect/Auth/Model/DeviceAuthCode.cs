@@ -17,19 +17,19 @@ namespace Secucard.Connect.Auth.Model
     [DataContract]
     public class DeviceAuthCode
     {
-        [DataMember(Name = "device_code")]
+        [DataMember(Name = "device_code", IsRequired = true)]
         public string DeviceCode { get; set; }
 
-        [DataMember(Name = "user_code")]
+        [DataMember(Name = "user_code", IsRequired = true)]
         public string UserCode { get; set; }
 
-        [DataMember(Name = "verification_url")]
+        [DataMember(Name = "verification_url", IsRequired = true)]
         public string VerificationUrl { get; set; }
 
-        [DataMember(Name = "expires_in")]
+        [DataMember(Name = "expires_in", IsRequired = true)]
         public int ExpiresIn { get; set; }
 
-        [DataMember(Name = "interval")]
+        [DataMember(Name = "interval", IsRequired = true)]
         public int Interval { get; set; }
 
         public override string ToString()

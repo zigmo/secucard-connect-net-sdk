@@ -21,19 +21,19 @@ namespace Secucard.Connect.Auth.Model
     {
         // Example: {"access_token":"73r39s7dccb27e37vho0hecs54","expires_in":1200,"token_type":"bearer","scope":null,"refresh_token":"02799fd07d091eefe4260d4c855a8f345d64c39a"}
 
-        [DataMember(Name = "access_token")]
+        [DataMember(Name = "access_token", IsRequired = true)]
         public string AccessToken { get; set; }
 
-        [DataMember(Name = "expires_in")]
+        [DataMember(Name = "expires_in", IsRequired = true)]
         public int ExpiresIn { get; set; }
 
-        [DataMember(Name = "token_type")]
+        [DataMember(Name = "token_type", IsRequired = true)]
         public string TokenType { get; set; }
 
-        [DataMember(Name = "scope")]
+        [DataMember(Name = "scope", IsRequired = true)]
         public string Scope { get; set; }
 
-        [DataMember(Name = "refresh_token")]
+        [DataMember(Name = "refresh_token", IsRequired = true)]
         public string RefreshToken { get; set; }
 
         public DateTime? ExpireTime { get; set; }

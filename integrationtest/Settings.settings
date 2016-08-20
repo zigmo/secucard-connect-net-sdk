@@ -1,0 +1,21 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Secucard.Connect.IntegrationTest" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="StubServer" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://localhost:5000</Value>
+    </Setting>
+    <Setting Name="SetStub" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">/set_stub/</Value>
+    </Setting>
+    <Setting Name="GetStub" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">/get_stub</Value>
+    </Setting>
+    <Setting Name="ValidateStub" Type="System.String" Scope="User">
+      <Value Profile="(Default)">/validate</Value>
+    </Setting>
+    <Setting Name="Static" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">/static/</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

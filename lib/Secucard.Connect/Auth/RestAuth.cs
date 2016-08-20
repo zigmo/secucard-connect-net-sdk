@@ -10,6 +10,9 @@
  * limitations under the License.
  */
 
+using System.Runtime.Serialization;
+using Secucard.Connect.Auth.Exception;
+
 namespace Secucard.Connect.Auth
 {
     using System;
@@ -46,8 +49,23 @@ namespace Secucard.Connect.Auth
             req.BodyParameter.Add(AuthConst.ClientSecret, clientSecret);
             req.BodyParameter.Add(AuthConst.Uuid, uuid);
 
-            var ret = RestPost(req);
-            return JsonSerializer.DeserializeJson<DeviceAuthCode>(ret);
+            try
+            {
+                var ret = RestPost(req);
+                return JsonSerializer.DeserializeJson<DeviceAuthCode>(ret);
+            }
+            catch (RestException ex)
+            {
+                switch (ex.StatusCode)
+                {
+                    case 400:
+                    case 401:
+                        throw new AuthDeniedException(
+                            JsonSerializer.DeserializeJson<AuthCodeError>(ex.BodyText).ErrorDescription);
+                }
+            }
+
+            return null;
         }
 
         public Token GetToken(string clientId, string clientSecret)
@@ -87,8 +105,17 @@ namespace Secucard.Connect.Auth
             catch (RestException ex)
             {
                 // ignore 401 Error and return null
-                if (ex.StatusCode == 401) return null;
-                throw;
+                switch (ex.StatusCode)
+                {
+                    case 400:
+                        throw new AuthTimeoutException("Timeout signaled by server");
+
+                    case 401:
+                        return null;
+
+                    default:
+                        throw;
+                }
             }
         }
 

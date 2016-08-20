@@ -160,6 +160,7 @@ namespace Secucard.Connect.Auth
             if (isDeviceAuth)
             {
                 codes = _rest.GetDeviceAuthCode(devicesCredentials.ClientId, devicesCredentials.ClientSecret, devicesCredentials.DeviceId);
+
                 if (TokenManagerStatusUpdateEvent != null)
                     TokenManagerStatusUpdateEvent.Invoke(this,
                         new TokenManagerStatusUpdateEventArgs
@@ -176,7 +177,7 @@ namespace Secucard.Connect.Auth
                 {
                     t = _config.AuthWaitTimeoutSec;
                 }
-                timeout = DateTime.Now.AddSeconds(t*1000);
+                timeout = DateTime.Now.AddSeconds(t);
 
                 pollInterval = codes.Interval;
                 if (pollInterval <= 0)
@@ -214,8 +215,21 @@ namespace Secucard.Connect.Auth
                         }
                     }
 
-                    token = _rest.ObtainAuthToken(codes.DeviceCode, devicesCredentials.ClientId,
-                        devicesCredentials.ClientSecret);
+                    try
+                    {
+                        token = _rest.ObtainAuthToken(codes.DeviceCode, devicesCredentials.ClientId,
+                            devicesCredentials.ClientSecret);
+
+                    }
+                    catch (AuthTimeoutException)
+                    {
+                        OnTokenManagerStatusUpdateEvent(new TokenManagerStatusUpdateEventArgs
+                        {
+                            Status = AuthStatusEnum.Canceled
+                        });
+                        throw;
+                    }
+
                     if (token == null) // auth not completed yet
                     {
                         OnTokenManagerStatusUpdateEvent(new TokenManagerStatusUpdateEventArgs
@@ -240,7 +254,12 @@ namespace Secucard.Connect.Auth
 
             if (isDeviceAuth)
             {
-                throw new AuthTimeoutException();
+                OnTokenManagerStatusUpdateEvent(new TokenManagerStatusUpdateEventArgs
+                {
+                    DeviceAuthCodes = codes,
+                    Status = AuthStatusEnum.Canceled
+                });
+                throw new AuthTimeoutException("Timeout signaled by timer");
             }
 
             throw new System.Exception("Unexpected failure of authentication.");

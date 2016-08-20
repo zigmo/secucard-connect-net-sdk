@@ -100,7 +100,7 @@ namespace Secucard.Connect.Test.Client
             };
 
             var transaction = transactionService.Create(newTrans);
-            Assert.AreEqual(transaction.Status, Transaction.StatusCreated);
+            Assert.AreEqual(transaction.Status, "Created");
 
 
             // you may edit some transaction data and update
