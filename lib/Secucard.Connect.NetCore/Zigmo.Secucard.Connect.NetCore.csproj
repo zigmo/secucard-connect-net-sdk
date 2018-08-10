@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>Zigmo.Secucard.Connect.NetCore</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>zigmo</Authors>
+    <Description>Fork of Secucard.Connect to use with netstandard</Description>
+    <PackageLicenseUr>https://github.com/zigmo/secucard-connect-net-sdk/blob/master/LICENSE.md</PackageLicenseUr>
+    <PackageProjectUrl>https://github.com/zigmo/secucard-connect-net-sdk</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/zigmo/secucard-connect-net-sdk</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+  </ItemGroup>
+
+</Project>
